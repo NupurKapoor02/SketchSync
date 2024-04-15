@@ -1,0 +1,14 @@
+.row{
+    height: 100px;
+    padding-top: 10px;
+}
+
+.form-box{
+    height: 400px;
+    border: 2px solid blue;
+}
+
+.text{
+    color: blue;
+    font-weight: bold;
+}
