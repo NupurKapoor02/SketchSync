@@ -1,7 +1,7 @@
 // IL9ns3cQkOBoRggH
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb+srv://vishwance21:IL9ns3cQkOBoRggH@cluster0.83kb0kp.mongodb.net/")
+mongoose.connect("mongodb+srv://vishwance21:123@cluster0.83kb0kp.mongodb.net/")
 .then(()=>{
     console.log("mongodb connected");
 })
