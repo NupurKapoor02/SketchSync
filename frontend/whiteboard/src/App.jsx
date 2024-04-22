@@ -2,6 +2,8 @@ import './App.css';
 import React from 'react';
 import Forms from './components/Forms/index'
 import Room from './pages/Room';
+import Login from './pages/Login/index';
+import Register from './pages/Register/index';
 import {Route, Routes} from "react-router-dom";
 import io from "socket.io-client"
 import {useState} from 'react';
@@ -9,7 +11,7 @@ import {useEffect} from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 
-const server = "http://localhost:5000";
+const server = "http://localhost:8000";
 const connectionOptions = {
   "force new connection": true,
   reconnectionAttempts: "Infinity",
@@ -63,8 +65,13 @@ const App=()=> {
     <div className="container">
       <Routes>
         
-        <Route path ="/" element= {<Forms uuid = {uuid} socket={socket} setUser={setUser}/>} />
+        <Route path ="/home" element= {<Forms uuid = {uuid} socket={socket} setUser={setUser}/>} />
         <Route path = "/room" element={<Room />} />
+        <Route path="/signup" element = {<Register/>}/>
+          
+        <Route path="/" element= {<Login />}/>
+            
+        
       </Routes>
       {/* <Room /> */}
     </div>

@@ -1,30 +1,80 @@
-// const app = require('express')();
-// const server = require('http').createServer(app);
-// const { server } = require('socket.io');
 
-// const io = new Server(server);
-// io.on('connection', (socket) => { 
-//     socket.on("userJoined",(data)=>
-//     {const{ name,userId, roomId, host, presenter} = data;
-// socket.join(roomId);
-// socket.emit("userIsJoined",{success : true })}
-// )});
-
-// const port = process.env.PORT || 5000;
-// server.listen(port, ()=>
-// console.log("Server running on http://localhost:5000"));
 
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const { userJoin, getUsers, userLeave } = require("./utils/user");
 
+
+
 const app = express();
 const server = http.createServer(app);
 const socketIO = require("socket.io");
 const io = socketIO(server);
 
+/*user authentication*/
+const collection = require("./mongo.js")
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cors());
+
+app.get("/",cors(),(req,res)=>{
+
+})
+
+
+app.post("/",async(req,res)=>{
+    const{email,password}=req.body
+
+    try{
+        const check=await collection.findOne({email:email})
+
+        if(check){
+            res.json("exist")
+        }
+        else{
+            res.json("notexist")
+        }
+
+    }
+    catch(e){
+        res.json("fail")
+    }
+
+})
+
+
+
+app.post("/signup",async(req,res)=>{
+    const{email,password}=req.body
+
+    const data={
+        email:email,
+        password:password
+    }
+
+    try{
+        const check=await collection.findOne({email:email})
+
+        if(check){
+            res.json("exist")
+        }
+        else{
+            res.json("notexist")
+            await collection.insertMany([data])
+        }
+
+    }
+    catch(e){
+        res.json("fail")
+    }
+
+})
+
+
+
+
+
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -77,7 +127,7 @@ io.on("connection", (socket) => {
 });
 
 // serve on port
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, () =>
   console.log(`server is listening on http://localhost:${PORT}`)
