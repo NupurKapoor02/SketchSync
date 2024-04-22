@@ -66,7 +66,7 @@ const App=()=> {
       <Routes>
         
         <Route path ="/home" element= {<Forms uuid = {uuid} socket={socket} setUser={setUser}/>} />
-        <Route path = "/room" element={<Room />} />
+        <Route path = "/:roomId" element={<Room />} />
         <Route path="/signup" element = {<Register/>}/>
           
         <Route path="/" element= {<Login />}/>
