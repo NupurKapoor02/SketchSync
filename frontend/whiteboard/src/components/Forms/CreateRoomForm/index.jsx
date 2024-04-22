@@ -46,7 +46,7 @@ const CreateRoomForm = ({uuid, socket, setUser}) => {
                     </div>
                 </div>
             </div>
-            <button type="submit" className="mt-4 btn-primary btn-block form-control">Generate Room</button>
+            <button type="submit" onClick={handleCreateRoom} className="mt-4 btn-primary btn-block form-control">Generate Room</button>
         </form>
     );
 };
