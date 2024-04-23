@@ -3,14 +3,18 @@
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
+
 const { userJoin, getUsers, userLeave } = require("./utils/user");
 
 
 
 const app = express();
-const server = http.createServer(app);
-const socketIO = require("socket.io");
-const io = socketIO(server);
+const server = require("http").createServer(app);
+// const socketIO = require("socket.io");
+// const io = socketIO(server);
+
+const {Server} = require ("socket.io");
+const io = new Server(server);
 
 /*user authentication*/
 const collection = require("./mongo.js")
@@ -35,6 +39,9 @@ app.post("/",async(req,res)=>{
         else{
             res.json("notexist")
         }
+
+
+       
 
     }
     catch(e){
@@ -75,14 +82,14 @@ app.post("/signup",async(req,res)=>{
 
 
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With, Content-Type, Accept"
+//   );
+//   next();
+// });
 
 app.get("/", (req, res) => {
   res.send("server");
@@ -91,43 +98,51 @@ app.get("/", (req, res) => {
 // socket.io
 let imageUrl, userRoom;
 io.on("connection", (socket) => {
+  socket.on("takeThisData", (data)=>{
+    console.log(data);
+    socket.broadcast.emit("giveMeData", {data: data});
+  })
   socket.on("user-joined", (data) => {
+    console.log("User Joined")
     const { roomId, userId, userName, host, presenter } = data;
     userRoom = roomId;
-    const user = userJoin(socket.id, userName, roomId, host, presenter);
-    const roomUsers = getUsers(user.room);
-    socket.join(user.room);
+    // const user = userJoin(socket.id, userName, roomId, host, presenter);
+    
+    socket.join(roomId);
     socket.emit("message", {
-      message: "Welcome to ChatRoom",
+      success: true
     });
-    socket.broadcast.to(user.room).emit("message", {
-      message: `${user.username} has joined`,
+    socket.broadcast.to(roomId).emit("whiteBoardDataResponse", {
+      // message: `${user.username} has joined`,
+      imgURL: imageUrl,
     });
 
-    io.to(user.room).emit("users", roomUsers);
-    io.to(user.room).emit("canvasImage", imageUrl);
+    // io.to(roomId).emit("users", roomUsers);
+    io.to(roomId).emit("canvasImage", imageUrl);
+    console.log("GODATA");
   });
 
-  socket.on("drawing", (data) => {
+  socket.on("whiteboardData", (data) => {
     imageUrl = data;
-    socket.broadcast.to(userRoom).emit("canvasImage", imageUrl);
+      socket.broadcast.to(userRoom).emit("whiteBoardDataResponse", {imgURL: data});
+      // console.log(data); 
   });
 
-  socket.on("disconnect", () => {
-    const userLeaves = userLeave(socket.id);
-    const roomUsers = getUsers(userRoom);
+  // socket.on("disconnect", () => {
+  //   const userLeaves = userLeave(socket.id);
+  //   const roomUsers = getUsers(userRoom);
 
-    if (userLeaves) {
-      io.to(userLeaves.room).emit("message", {
-        message: `${userLeaves.username} left the chat`,
-      });
-      io.to(userLeaves.room).emit("users", roomUsers);
-    }
-  });
+  //   if (userLeaves) {
+  //     io.to(userLeaves.room).emit("message", {
+  //       message: `${userLeaves.username} left the chat`,
+  //     });
+  //     io.to(userLeaves.room).emit("users", roomUsers);
+  //   }
+  // });
 });
 
 // serve on port
-const PORT = process.env.PORT || 8000;
+const PORT =  8000 ;
 
 server.listen(PORT, () =>
   console.log(`server is listening on http://localhost:${PORT}`)

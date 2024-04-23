@@ -28,7 +28,7 @@ const JoinRoomForm = ({uuid,socket, setUser}) => {
     };
         return (
 
-        <div><h1>Hello {location.state.id} and welcome to the home</h1> 
+        <div>
             <form className="form col-md-12 mt-5">
                 <div className="form-group">
                     <input

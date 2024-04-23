@@ -18,17 +18,15 @@ function Login() {
                 email,password
             })
             .then(res=>{
-                // if(res.data=="exist"){
-                //     alert("User already exists")
-                // }
-                // else if(res.data=="notexist"){
-                //     history("/home",{state:{id:email}})
-                // }
-                if (res.status === 200) {
-                    history("/home", { state: { id: email } });
-                  } else {
-                    alert("An error occurred during signup");
-                  }
+                if(res.data=="exist"){
+                    alert("User already exists")
+                }
+                else if(res.data=="notexist"){
+                    
+                    history("/home",{state:{id:email}})
+                }
+
+               
             })
             .catch(e=>{
                 alert("wrong details")

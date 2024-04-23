@@ -10,11 +10,24 @@ const Canvas = ({
   elements,
   tool,
   socket,
-}) => {
+  user,
+}) => 
+{
+  const [img,setImg] = useState(null);
+  useEffect(() => {
+  },[]);
+  
+
+  
   const [isDrawing, setIsDrawing] = useState(false);
+  
+
+
 
   useEffect(() => {
+    if (canvasRef.current) {
     const canvas = canvasRef.current;
+    
     canvas.height = window.innerHeight * 2;
     canvas.width = window.innerWidth * 2;
     canvas.style.width = `${window.innerWidth}px`;
@@ -27,11 +40,15 @@ const Canvas = ({
     context.strokeStyle = color;
     context.lineWidth = 5;
     ctx.current = context;
-  }, []);
+    }
+  }, [canvasRef,color]);
 
+  
   useEffect(() => {
-    ctx.current.strokeStyle = color;
-  }, [color]);
+    if (canvasRef.current) {
+      const context = canvasRef.current.getContext("2d");
+    ctx.current.strokeStyle = color;}
+  }, [color,ctx]);
 
   const handleMouseDown = (e) => {
     const { offsetX, offsetY } = e.nativeEvent;
@@ -58,6 +75,8 @@ const Canvas = ({
   };
 
   useLayoutEffect(() => {
+    if(canvasRef.current && ctx)
+  {
     const roughCanvas = rough.canvas(canvasRef.current);
     if (elements.length > 0) {
       ctx.current.clearRect(
@@ -92,14 +111,19 @@ const Canvas = ({
         });
       }
     });
+  
+ 
     const canvasImage = canvasRef.current.toDataURL();
-    //socket.emit("drawing", canvasImage);
+    console.log("EMIITING");
+    socket.emit("whiteboardData", canvasImage);
+  }
   }, [elements]);
 
   const handleMouseMove = (e) => {
     if (!isDrawing) {
       return;
     }
+    // socket.emit("takeThisData", ("HELLO"));
     const { offsetX, offsetY } = e.nativeEvent;
 
     if (tool === "rect") {
@@ -152,17 +176,39 @@ const Canvas = ({
     setIsDrawing(false);
   };
 
-  return (
-    <div
-      className="col-md-8 overflow-hidden border border-dark px-0 mx-auto mt-3"
-      style={{ height: "500px" }}
-      onMouseDown={handleMouseDown}
+  
+
+    if(user && !user.presenter)
+    {
+      return (
+        <div
+          className="col-md-8 overflow-hidden border border-dark px-0 mx-auto mt-3"
+          style={{ height: "500px" }}
+        >
+          
+        <img src ={img} alt ="real time wb img" className="w-100 h-100"></img>
+        </div>
+      );
+    }
+    function draw(data, canvasRef){
+      canvasRef.drawImage(data, 0, 0);      
+    }
+    return(
+    <div  className="col-md-8 overflow-hidden border border-dark px-0 mx-auto mt-3"
+    style={{ height: "500px" }}
+      onMouseDown={handleMouseDown} 
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-    >
+      >
       <canvas ref={canvasRef} />
     </div>
+
+   
+
   );
+
+
+ 
 };
 
 export default Canvas;
