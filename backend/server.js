@@ -100,7 +100,7 @@ let imageUrl, userRoom;
 io.on("connection", (socket) => {
   socket.on("takeThisData", (data)=>{
     console.log(data);
-    socket.broadcast.emit("giveMeData", {data: data});
+    socket.broadcast.emit("giveMeData", data);
   })
   socket.on("user-joined", (data) => {
     console.log("User Joined")

@@ -13,8 +13,15 @@ const Canvas = ({
   user,
 }) => 
 {
+  const [context, setContext] = useState(undefined);
   const [img,setImg] = useState(null);
   useEffect(() => {
+    setContext(canvasRef.current?.getContext("2d"));
+    console.log("RELODING")
+    socket.on("giveMeData", data=>{
+      console.log(data);
+      canvasRef.current?.getContext("2d").fillRect(data.x, data.y, 5, 5);
+    });
   },[]);
   
 
@@ -123,54 +130,55 @@ const Canvas = ({
     if (!isDrawing) {
       return;
     }
-    // socket.emit("takeThisData", ("HELLO"));
     const { offsetX, offsetY } = e.nativeEvent;
+    socket.emit("takeThisData", {x: offsetX, y:offsetY});
+    context.fillRect(offsetX, offsetY, 5, 5);
+    // if (tool === "rect") {
+    //   setElements((prevElements) =>
+    //     prevElements.map((ele, index) =>
+    //       index === elements.length - 1
+    //         ? {
+    //             offsetX: ele.offsetX,
+    //             offsetY: ele.offsetY,
+    //             width: offsetX - ele.offsetX,
+    //             height: offsetY - ele.offsetY,
+    //             stroke: ele.stroke,
+    //             element: ele.element,
+    //           }
+    //         : ele
+    //     )
+    //   );
+    // } else if (tool === "line") {
+    //   setElements((prevElements) =>
+    //     prevElements.map((ele, index) =>
+    //       index === elements.length - 1
+    //         ? {
+    //             offsetX: ele.offsetX,
+    //             offsetY: ele.offsetY,
+    //             width: offsetX,
+    //             height: offsetY,
+    //             stroke: ele.stroke,
+    //             element: ele.element,
+    //           }
+    //         : ele
+    //     )
+    //   );
+    // } else if (tool === "pencil") {
+    //   setElements((prevElements) =>
+    //     prevElements.map((ele, index) =>
+    //       index === elements.length - 1
+    //         ? {
+    //             offsetX: ele.offsetX,
+    //             offsetY: ele.offsetY,
+    //             path: [...ele.path, [offsetX, offsetY]],
+    //             stroke: ele.stroke,
+    //             element: ele.element,
+    //           }
+    //         : ele
+    //     )
+    //   );
+    // }
 
-    if (tool === "rect") {
-      setElements((prevElements) =>
-        prevElements.map((ele, index) =>
-          index === elements.length - 1
-            ? {
-                offsetX: ele.offsetX,
-                offsetY: ele.offsetY,
-                width: offsetX - ele.offsetX,
-                height: offsetY - ele.offsetY,
-                stroke: ele.stroke,
-                element: ele.element,
-              }
-            : ele
-        )
-      );
-    } else if (tool === "line") {
-      setElements((prevElements) =>
-        prevElements.map((ele, index) =>
-          index === elements.length - 1
-            ? {
-                offsetX: ele.offsetX,
-                offsetY: ele.offsetY,
-                width: offsetX,
-                height: offsetY,
-                stroke: ele.stroke,
-                element: ele.element,
-              }
-            : ele
-        )
-      );
-    } else if (tool === "pencil") {
-      setElements((prevElements) =>
-        prevElements.map((ele, index) =>
-          index === elements.length - 1
-            ? {
-                offsetX: ele.offsetX,
-                offsetY: ele.offsetY,
-                path: [...ele.path, [offsetX, offsetY]],
-                stroke: ele.stroke,
-                element: ele.element,
-              }
-            : ele
-        )
-      );
-    }
   };
   const handleMouseUp = () => {
     setIsDrawing(false);
@@ -186,7 +194,7 @@ const Canvas = ({
           style={{ height: "500px" }}
         >
           
-        <img src ={img} alt ="real time wb img" className="w-100 h-100"></img>
+        {/* <img src ={img} alt ="real time wb img" className="w-100 h-100"></img> */}
         </div>
       );
     }
